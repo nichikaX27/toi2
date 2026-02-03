@@ -53,7 +53,13 @@
         <h1>全問終了！</h1>
         <p>スコア：</p>
         <div class="score-val" id="final-score">0 / 19</div>
-        <button onclick="location.reload()" style="background:#3498db; color:white; border:none; padding:15px 40px; border-radius:30px; cursor:pointer;">もう一度挑戦する</button>
+        
+        <div id="review-area" style="display:none; text-align:left; max-width: 100%; margin: 20px auto;">
+            <h3 style="color:#e74c3c; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top:30px;">間違えた問題の復習</h3>
+            <div id="review-list"></div>
+        </div>
+
+        <button onclick="location.reload()" style="background:#3498db; color:white; border:none; padding:15px 40px; border-radius:30px; cursor:pointer; margin-top:20px;">もう一度挑戦する</button>
     </div>
 </div>
 
@@ -84,6 +90,7 @@
     let currentIndex = 0;
     let score = 0;
     let answered = false;
+    let wrongLog = [];
 
     function displayQuestion() {
         answered = false;
@@ -107,7 +114,14 @@
             if(btnText === correctAns) btn.classList.add('correct');
             if(btnText === choice && choice !== correctAns) btn.classList.add('incorrect');
         });
-        if(choice === correctAns) score++;
+        if(choice === correctAns) {
+            score++;
+        } else {
+            wrongLog.push({
+                q: questions[currentIndex],
+                yours: choice
+            });
+        }
         document.getElementById('next-btn').style.display = 'inline-block';
     }
 
@@ -121,6 +135,31 @@
         document.getElementById('quiz-screen').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+
+        if(wrongLog.length > 0) {
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
+            wrongLog.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.style.background = '#fff';
+                div.style.padding = '15px';
+                div.style.marginBottom = '10px';
+                div.style.borderRadius = '8px';
+                div.style.border = '1px solid #ddd';
+                div.style.borderLeft = '5px solid #e74c3c';
+                
+                div.innerHTML = `
+                    <div style="font-size:0.9em; color:#7f8c8d; margin-bottom:5px;">${item.q.jp}</div>
+                    <div style="font-weight:bold; margin-bottom:8px; font-size:1.1em;">${item.q.q}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:#e74c3c; font-weight:bold;">あなたの回答: ${item.yours}</span>
+                        <span style="color:#2ecc71; font-weight:bold; background:#eafaf1; padding:2px 8px; border-radius:4px;">正解: ${item.q.a}</span>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            document.getElementById('review-area').style.display = 'block';
+        }
     }
 
     displayQuestion();
