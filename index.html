@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>専門英語：問2 全フレーズ網羅テスト</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 800px; width: 100%; }
+        h1 { color: #2c3e50; font-size: 1.6em; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        .progress { color: #7f8c8d; margin-bottom: 10px; text-align: right; font-weight: bold; }
+        .question-box { margin-bottom: 30px; text-align: left; min-height: 120px; }
+        .jp-text { color: #666; font-size: 0.95em; margin-bottom: 10px; background: #f9f9f9; padding: 15px; border-radius: 5px; line-height: 1.4; }
+        .en-text { font-size: 1.25em; font-weight: bold; line-height: 1.5; color: #333; padding: 10px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        button.option-btn {
+            padding: 18px; font-size: 1.1em; border: 2px solid #3498db; border-radius: 10px;
+            background: white; color: #3498db; cursor: pointer; transition: 0.2s; font-weight: bold;
+        }
+        button.option-btn:hover { background: #eef7ff; }
+        button.option-btn.correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724 !important; }
+        button.option-btn.incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24 !important; }
+        .next-area { margin-top: 30px; text-align: center; }
+        #next-btn {
+            background-color: #2ecc71; color: white; border: none; padding: 12px 50px;
+            border-radius: 25px; font-size: 1.1em; cursor: pointer; display: none;
+        }
+        #result-screen { display: none; text-align: center; }
+        .score-val { font-size: 4em; color: #3498db; margin: 20px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-screen">
+        <h1>問2 全フレーズ網羅マスター (全17問)</h1>
+        <div class="progress" id="progress">1 / 17</div>
+        <div class="question-box">
+            <div id="jp-display" class="jp-text"></div>
+            <div id="en-display" class="en-text"></div>
+        </div>
+        <div class="options" id="options">
+            <button class="option-btn" onclick="checkAnswer('a')">a</button>
+            <button class="option-btn" onclick="checkAnswer('an')">an</button>
+            <button class="option-btn" onclick="checkAnswer('the')">the</button>
+            <button class="option-btn" onclick="checkAnswer('∅')">∅ (無冠詞)</button>
+        </div>
+        <div class="next-area">
+            <button id="next-btn" onclick="nextQuestion()">次の問題へ進む →</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h1>全問終了！</h1>
+        <p>スコア：</p>
+        <div class="score-val" id="final-score">0 / 19</div>
+        <button onclick="location.reload()" style="background:#3498db; color:white; border:none; padding:15px 40px; border-radius:30px; cursor:pointer;">もう一度挑戦する</button>
+    </div>
+</div>
+
+<script>
+    // 全PDFから抽出した全フレーズリスト
+    const questions = [
+        { q: "High speed computation has revolutionized ( ) numerical analysis.", a: "∅", jp: "高速計算は数値解析を一変させた。" },
+        { q: "This property is due to ( ) assumption that the noise is Gaussian.", a: "the", jp: "この性質は誤差が正規分布に従うという仮定に起因する。" },
+        { q: "These functions are computed by ( ) Taylor expansion or other approximation formulae.", a: "the", jp: "これらの関数はテイラー展開や他の近似公式によって計算される。" },
+        { q: "This solution was obtained in ( ) new computing environment.", a: "a", jp: "この解は新しい計算環境で求めた。" },
+        { q: "Two random variables X and Y are uncorrelated if ( ) covariance between them is zero.", a: "the", jp: "二つの確率変数X、Yはそれらの間の共分散が0のとき「無相関」であるという。" },
+        { q: "The solution is obtained by ( ) application of this formula.", a: "∅", jp: "この公式を適用すれば解が得られる。" },
+        { q: "This result is obtained by ( ) differentiation of Eq. (3) with respect to θ.", a: "∅", jp: "この結果は式(3)をθについて微分すれば得られる。" },
+        { q: "The result can be shown by ( ) simple computation.", a: "a", jp: "簡単な計算によってこの結果が示せる。" },
+        { q: "Needless to say, ( ) fact that Eq. (5) has a unique solution is very important.", a: "the", jp: "言うまでもなく、式(5)が唯一の解を持つという事実は非常に重要である。" },
+        { q: "We multiply Eq. (3) by C on ( ) both sides.", a: "∅", jp: "式(3)の両辺をC倍する。" },
+        { q: "This is easily proved by using ( ) Euler's theorem.", a: "∅", jp: "これはオイラーの定理を使って簡単に証明される。" },
+        { q: "In such a situation, we should be satisfied with ( ) second best solution.", a: "a", jp: "そのような場合は次善の解で満足すべきである。" },
+        { q: "As pointed out earlier, ( ) existence of such functions is obvious.", a: "the", jp: "先に指摘したように、そのような関数の存在は明らかである。" },
+        { q: "We neglect ( ) third order terms in z.", a: "∅", jp: "zの3次の項は無視する。" },
+        { q: "This problem requires ( ) careful consideration.", a: "∅", jp: "この問題は注意深く考える必要がある。" },
+        { q: "There is ( ) situation in which this approach is necessary.", a: "a", jp: "このアプローチが必要となる場合がある。" },
+        { q: "As is well known, ( ) area of a circle with radius r is πr².", a: "the", jp: "よく知られているように、半径rの円の面積はπr²である。" },
+        //{ q: "This formula provides ( ) excellent approximation.", a: "an", jp: "この公式は優れた近似を与える。" },
+        //{ q: "The loss in efficiency is compensated for by the gain in ( ) accuracy.", a: "∅", jp: "計算の効率は低下しても、その分精度が向上している。" }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function displayQuestion() {
+        answered = false;
+        document.getElementById('next-btn').style.display = 'none';
+        const q = questions[currentIndex];
+        document.getElementById('progress').innerText = `${currentIndex + 1} / ${questions.length}`;
+        document.getElementById('jp-display').innerText = q.jp;
+        document.getElementById('en-display').innerText = q.q;
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(btn => { btn.className = 'option-btn'; btn.disabled = false; });
+    }
+
+    function checkAnswer(choice) {
+        if(answered) return;
+        answered = true;
+        const correctAns = questions[currentIndex].a;
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(btn => {
+            btn.disabled = true;
+            const btnText = btn.innerText.includes('∅') ? '∅' : btn.innerText;
+            if(btnText === correctAns) btn.classList.add('correct');
+            if(btnText === choice && choice !== correctAns) btn.classList.add('incorrect');
+        });
+        if(choice === correctAns) score++;
+        document.getElementById('next-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if(currentIndex < questions.length) displayQuestion();
+        else showResult();
+    }
+
+    function showResult() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+    }
+
+    displayQuestion();
+</script>
+</body>
+</html>
